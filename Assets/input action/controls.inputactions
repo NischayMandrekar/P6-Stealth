@@ -25,7 +25,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Aim",
+                    "name": "Crouch",
                     "type": "Button",
                     "id": "43f5de91-b7f8-45ac-b67e-c960057775aa",
                     "expectedControlType": "",
@@ -168,11 +168,22 @@
                 {
                     "name": "",
                     "id": "cb1bab39-eec7-48fb-a874-73c7d31ce1ea",
-                    "path": "<Mouse>/rightButton",
+                    "path": "<Keyboard>/leftCtrl",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Aim",
+                    "action": "Crouch",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "82008fa5-dc85-4527-aa5f-db1df77edaf1",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Crouch",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

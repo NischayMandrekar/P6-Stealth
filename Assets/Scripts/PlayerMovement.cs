@@ -6,13 +6,13 @@ public class PlayerMovement : MonoBehaviour
     //  private readonly int speed= Animator.StringToHash("Speed");
     // private readonly int isAiming= Animator.StringToHash("isAiming");
     [SerializeField] float moveSpeed;
-    [SerializeField] float aimSpeed;
+    [SerializeField] float crouchSpeed;
     [SerializeField] float Rotation_damping;
     [SerializeField] float gravity = -9.81f;
     [SerializeField] float groundedForce = -2f;
     Vector3 targetRotation;
     float verticalVelocity;
-    bool isDead;
+    // bool isDead;
     float curSpeed;
     
     Vector2 move,mouseLook;
@@ -20,8 +20,7 @@ public class PlayerMovement : MonoBehaviour
     CharacterController characterController;
     // float health;
     // Animator animator;
-    public bool aiming;
-
+    bool isCrouch;
     void Awake()
     {
         characterController = GetComponent<CharacterController>();
@@ -31,7 +30,8 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        curSpeed = aiming ? aimSpeed : moveSpeed;
+        curSpeed = isCrouch ? crouchSpeed : moveSpeed;
+        print(curSpeed);
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(mouseLook);
         if (Physics.Raycast(ray, out hit))
@@ -66,19 +66,7 @@ public class PlayerMovement : MonoBehaviour
         
         var lookpos = targetRotation - transform.position;
         lookpos.y = 0;
-        // animator.SetBool(isAiming, aiming);
-        if (aiming)
-        {
-            
-            if (lookpos.sqrMagnitude > 0.001f)
-            {
-                var rotation = Quaternion.LookRotation(lookpos);
-                transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * Rotation_damping);
-            }
-        }
-        else
-        {
-            if (horMovement.sqrMagnitude > 0.001f)
+        if (horMovement.sqrMagnitude > 0.001f)
             {
                 transform.rotation = Quaternion.Slerp(
                     transform.rotation,
@@ -86,7 +74,6 @@ public class PlayerMovement : MonoBehaviour
                     Time.deltaTime * Rotation_damping
                 );
             }     
-        }
         characterController.Move(movement * Time.deltaTime);
         // animator.SetFloat(speed, move.magnitude);
     }
@@ -98,15 +85,15 @@ public class PlayerMovement : MonoBehaviour
     {
         mouseLook = context.ReadValue<Vector2>();
     }
-    public void OnAim(InputAction.CallbackContext context)
+    public void OnCrouch(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
-            aiming = true; 
+            isCrouch = true;
         }
         if (context.canceled)
         {
-            aiming = false;
+            isCrouch = false;
         }
     }
 }
