@@ -12,16 +12,30 @@ public class EnemyMovement : MonoBehaviour
 
     [Header("Search")]
     [SerializeField] float dwellTime = 2f;
+    [SerializeField] float detectionTimer = 2f;
+    [SerializeField] float slowRate=1;
+    [SerializeField] float fastRate=2;
+    float detecting;
     // [SerializeField] float searchRotateSpeed = 120f;
 
+    [Header("colors")]
+    [SerializeField] MeshRenderer bodyMesh;
+    [SerializeField] Color searchColor;
+    [SerializeField] Color detectingColor;
+
+    Material bodyMaterial;
+    Color origColor;
     CharacterController characterController;
     FieldOFView fieldOFView;
+    PlayerMovement playerMovement;
 
     Vector3 guardPosition;
     Vector3 lastSeenPosition;
 
     float playerLastSeenTime = Mathf.Infinity;
     bool reachedLastSeen = true;
+    bool wasSeeingPlayer=false;
+
 
     int currWaypointIndex = 0;
 
@@ -33,6 +47,9 @@ public class EnemyMovement : MonoBehaviour
 
     void Start()
     {
+        playerMovement = fieldOFView.playerRef.GetComponent<PlayerMovement>();
+        bodyMaterial = bodyMesh.material;
+        origColor = bodyMaterial.color;
         guardPosition = transform.position;
     }
 
@@ -40,12 +57,27 @@ public class EnemyMovement : MonoBehaviour
     {
         if (fieldOFView.canSeePlayer)
         {
-            HandleChase();
+            detecting += playerMovement.isCrouch ? Time.deltaTime * slowRate : Time.deltaTime * fastRate;
+            float t = detecting / detectionTimer;
+            if (detecting < detectionTimer)
+            {
+                bodyMaterial.color = Color.Lerp(origColor, detectingColor, t);
+            }
+            else
+            {
+                bodyMaterial.color = searchColor;
+                HandleChase();
+            }
         }
         else
         {
+            if (wasSeeingPlayer)
+            {
+                detecting = 0;
+            }
             HandleSearchAndPatrol();
         }
+        wasSeeingPlayer = fieldOFView.canSeePlayer;
     }
 
     void HandleChase()
@@ -68,6 +100,7 @@ public class EnemyMovement : MonoBehaviour
     {
         if (!reachedLastSeen)
         {
+            bodyMaterial.color = detectingColor;
             Move(lastSeenPosition);
 
             if (Vector3.Distance(transform.position, lastSeenPosition) < wayPointTolerance)
@@ -79,13 +112,16 @@ public class EnemyMovement : MonoBehaviour
         }
 
         playerLastSeenTime += Time.deltaTime;
+        float t = playerLastSeenTime / dwellTime;
 
         if (playerLastSeenTime < dwellTime)
         {
+            bodyMaterial.color = Color.Lerp(detectingColor,origColor,t);
             // transform.Rotate(0, searchRotateSpeed * Time.deltaTime, 0);
         }
         else
         {
+            bodyMaterial.color = origColor;
             PatrolBehaviour();
         }
     }

@@ -84,7 +84,12 @@ MonoBehaviour:
   moveSpeed: 2
   stopDis: 2
   dwellTime: 2
-  searchRotateSpeed: 120
+  detectionTimer: 3
+  slowRate: 1
+  fastRate: 3
+  bodyMesh: {fileID: 2463558830205114645}
+  searchColor: {r: 0.0037735105, g: 0, b: 0, a: 0}
+  detectingColor: {r: 0.4264151, g: 0.0893058, b: 0.0893058, a: 0}
 --- !u!114 &-2882363086793222293
 MonoBehaviour:
   m_ObjectHideFlags: 0

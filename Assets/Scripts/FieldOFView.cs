@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class FieldOFView : MonoBehaviour
 {
+    
     public float radius;
     [Range(0, 360)]
     public float angle;
@@ -47,7 +48,7 @@ public class FieldOFView : MonoBehaviour
 
                 if (!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstructionMask))
                 {
-                    canSeePlayer = true;
+                        canSeePlayer = true;
                     print("Enemy Spotted");
                 }
                 else

@@ -20,14 +20,14 @@ public class PlayerMovement : MonoBehaviour
     CharacterController characterController;
     // float health;
     // Animator animator;
-    bool isCrouch;
+    public  bool isCrouch;
     void Awake()
     {
         characterController = GetComponent<CharacterController>();
         // animator = GetComponent<Animator>();
         // health = GetComponent<Health>().curHealth;
     }
-
+                       
     void Update()
     {
         curSpeed = isCrouch ? crouchSpeed : moveSpeed;
