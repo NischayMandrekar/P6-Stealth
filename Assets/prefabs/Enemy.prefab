@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 767174629437514871}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -43,10 +43,10 @@ GameObject:
   - component: {fileID: 3439219688264601390}
   - component: {fileID: 3558292423579370214}
   - component: {fileID: -2882363086793222293}
-  - component: {fileID: 2990051605212792319}
+  - component: {fileID: 3373840829578150636}
   m_Layer: 0
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -81,15 +81,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
   pPath: {fileID: 0}
   wayPointTolerance: 1
-  moveSpeed: 2
-  stopDis: 2
-  dwellTime: 2
-  detectionTimer: 3
+  moveSpeed: 3
+  playerStopDis: 2
+  genStopDis: 0.5
+  rotationSpeed: 6
+  dwellTime: 4
+  detectionTimer: 2
   slowRate: 1
   fastRate: 3
-  bodyMesh: {fileID: 2463558830205114645}
-  searchColor: {r: 0.0037735105, g: 0, b: 0, a: 0}
-  detectingColor: {r: 0.4264151, g: 0.0893058, b: 0.0893058, a: 0}
+  hearingDis: 8
+  maxSeenTime: 4
+  searchRotateSpeed: 120
+  gameOver: 0
+  bodyMesh: {fileID: 0}
+  searchColor: {r: 0, g: 0, b: 0, a: 0}
+  detectingColor: {r: 0.2528302, g: 0.0071555288, b: 0.0071555288, a: 0}
 --- !u!114 &-2882363086793222293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -102,7 +108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7da612cda74a6fc44a674e840e649dff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FieldOFView
-  radius: 5
+  radius: 4
   angle: 90
   playerRef: {fileID: 0}
   targetMask:
@@ -112,31 +118,28 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   canSeePlayer: 0
---- !u!143 &2990051605212792319
-CharacterController:
+--- !u!195 &3373840829578150636
+NavMeshAgent:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3132005269370283997}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Height: 2
+  m_AgentTypeID: 0
   m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 200
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 1
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &6475547215077025714
 GameObject:
   m_ObjectHideFlags: 0

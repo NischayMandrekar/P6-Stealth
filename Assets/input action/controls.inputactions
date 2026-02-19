@@ -34,12 +34,12 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Shoot",
+                    "name": "Clap",
                     "type": "Button",
                     "id": "af5e3d22-29d2-47a8-90f0-b78d374651c1",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": "",
+                    "interactions": "Press(behavior=2)",
                     "initialStateCheck": false
                 }
             ],
@@ -190,11 +190,11 @@
                 {
                     "name": "",
                     "id": "09c4f920-d8ec-4659-9986-a0111d8bdd7c",
-                    "path": "<Mouse>/leftButton",
+                    "path": "<Keyboard>/c",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Shoot",
+                    "action": "Clap",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

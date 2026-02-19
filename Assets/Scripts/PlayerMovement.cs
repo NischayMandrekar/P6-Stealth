@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,6 +11,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float Rotation_damping;
     [SerializeField] float gravity = -9.81f;
     [SerializeField] float groundedForce = -2f;
+    [SerializeField] float noiseDelay = 3f;
+    float noiseTimer = 0;
     Vector3 targetRotation;
     float verticalVelocity;
     // bool isDead;
@@ -21,8 +24,13 @@ public class PlayerMovement : MonoBehaviour
     // float health;
     // Animator animator;
     public  bool isCrouch;
+    public Vector3 noisePosition;
+    public bool noiseTrigger = false;
+    bool canClap = true;
+
     void Awake()
     {
+        canClap = true;
         characterController = GetComponent<CharacterController>();
         // animator = GetComponent<Animator>();
         // health = GetComponent<Health>().curHealth;
@@ -31,7 +39,6 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         curSpeed = isCrouch ? crouchSpeed : moveSpeed;
-        print(curSpeed);
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(mouseLook);
         if (Physics.Raycast(ray, out hit))
@@ -39,11 +46,17 @@ public class PlayerMovement : MonoBehaviour
             targetRotation = hit.point;
         }
         MovePlayer();
-        // if (health == 0 && isDead)
-        // {
-        //     isDead = true;
-        //     Destroy(this.gameObject);
-        // }
+        if (!canClap)
+        {
+            noiseTimer += Time.deltaTime;
+
+            if (noiseTimer > noiseDelay)
+            {
+                canClap = true;
+                noiseTimer = 0;
+            }
+        }
+
     }
     
     public void DeathHandler()
@@ -95,5 +108,23 @@ public class PlayerMovement : MonoBehaviour
         {
             isCrouch = false;
         }
+    }
+    public void OnClap(InputAction.CallbackContext context)
+    {
+
+        if (context.started&&canClap)
+        {
+            StartCoroutine(SetNoiseforFrame());
+        }
+    }
+    
+    IEnumerator SetNoiseforFrame()
+    {
+        print("clapped");
+        noisePosition = transform.position;
+        noiseTrigger = true;
+        canClap = false;
+        yield return new WaitForEndOfFrame();
+        noiseTrigger = false;
     }
 }
