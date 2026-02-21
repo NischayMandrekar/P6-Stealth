@@ -4001,7 +4001,7 @@ Transform:
   m_GameObject: {fileID: 1396992813}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.85, y: 0.12858184, z: -1.395}
+  m_LocalPosition: {x: 3.32, y: 0.12858184, z: -1.395}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4141,7 +4141,7 @@ MonoBehaviour:
   Rotation_damping: 6
   gravity: -9.81
   groundedForce: -2
-  noiseDelay: 2
+  noiseDelay: 1
   isCrouch: 0
   noisePosition: {x: 0, y: 0, z: 0}
   noiseTrigger: 0

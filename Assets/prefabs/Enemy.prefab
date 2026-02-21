@@ -81,19 +81,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
   pPath: {fileID: 0}
   wayPointTolerance: 1
-  moveSpeed: 3
+  moveSpeed: 2
   playerStopDis: 2
-  genStopDis: 0.5
+  genStopDis: 0
   rotationSpeed: 6
   dwellTime: 4
   detectionTimer: 2
   slowRate: 1
-  fastRate: 3
+  fastRate: 1.5
   hearingDis: 8
   maxSeenTime: 4
-  searchRotateSpeed: 120
+  searchRotateSpeed: 80
   gameOver: 0
-  bodyMesh: {fileID: 0}
+  bodyMesh: {fileID: 2463558830205114645}
   searchColor: {r: 0, g: 0, b: 0, a: 0}
   detectingColor: {r: 0.2528302, g: 0.0071555288, b: 0.0071555288, a: 0}
 --- !u!114 &-2882363086793222293

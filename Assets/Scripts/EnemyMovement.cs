@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -44,14 +45,13 @@ public class EnemyMovement : MonoBehaviour
     Vector3 lastSeenPosition;
 
     float playerLastSeenTime = Mathf.Infinity;
-    bool reachedLastSeen = true;
-    bool wasSeeingPlayer = false;
-    bool investigatingNoise = false;
+    bool HasStartMoving = true;
     float noiseDist;
-
-
-
     int currWaypointIndex = 0;
+
+    enum EnemyState { Patrol, Search, Detect, Chase ,Investigate}
+    EnemyState curState;
+    EnemyState prevState;
 
     void Awake()
     {
@@ -70,102 +70,53 @@ public class EnemyMovement : MonoBehaviour
 
     void Update()
     {
-        if (fieldOFView.canSeePlayer)
+        switch (curState)
         {
-            detecting += playerMovement.isCrouch ? Time.deltaTime * slowRate : Time.deltaTime * fastRate;
-            float t = detecting / detectionTimer;
-            if (detecting < detectionTimer)
-            {
-                bodyMaterial.color = Color.Lerp(origColor, detectingColor, t);
-            }
-            else
-            {
-                bodyMaterial.color = searchColor;
-                HandleChase();
-            }
-        }
-        else if (playerMovement.noiseTrigger && !fieldOFView.canSeePlayer)
-        {
-            noiseDist = (playerMovement.noisePosition - transform.position).sqrMagnitude;
-            if (noiseDist < hearingDis * hearingDis)
-            {
-                investigatingNoise = true;
-                lastSeenPosition = playerMovement.noisePosition;
-                reachedLastSeen = false;
-                playerLastSeenTime = 0;
-            }
-            else
-            {
-                investigatingNoise = false;
-                NormalBehaviour();
-            }
-        }
-        else
-        {
-            NormalBehaviour();
-        }
-        wasSeeingPlayer = fieldOFView.canSeePlayer;
-    }
-
-    void NormalBehaviour()
-    {
-        if (wasSeeingPlayer)
-        {
-            detecting = 0;
-        }
-
-        if (investigatingNoise)
-        {
-            print("inside normalbehaviour investigating when noise is heard");
-            HandleSearchAndPatrol(lastSeenPosition);
-
-            if (reachedLastSeen && playerLastSeenTime > dwellTime)
-            {
-                investigatingNoise = false;
-            }
-        }
-        else
-        {
-            HandleSearchAndPatrol(lastSeenPosition);
+            case EnemyState.Patrol:
+                PatrolBehaviour();
+                break;
+            case EnemyState.Detect:
+                DetectBehvaiour();
+                break;
+            case EnemyState.Chase:
+                ChaseBehaviour();
+                break;
+            case EnemyState.Search:
+                SearchBehaviour();
+                break;
+            case EnemyState.Investigate:
+                InvestigationBehaviour();
+                break;
         }
     }
-
-
-
-
-    void HandleSearchAndPatrol(Vector3 position)
-    {
-        navMeshAgent.updateRotation = false;
-        navMeshAgent.stoppingDistance = genStopDis;
-        if (!reachedLastSeen)
-        {
-            bodyMaterial.color = detectingColor;
-            Move(position);
-            if (navMeshAgent.remainingDistance==0)
-            {
-                reachedLastSeen = true;
-            }
-            return;
-        }
-
-        playerLastSeenTime += Time.deltaTime;
-        float t = playerLastSeenTime / dwellTime;
-
-        if (playerLastSeenTime < dwellTime)
-        {
-            bodyMaterial.color = Color.Lerp(detectingColor,origColor,t);
-            transform.Rotate(0, searchRotateSpeed* Time.deltaTime, 0);
-        }
-        else
-        {
-            bodyMaterial.color = origColor;
-            PatrolBehaviour();
-        }
-    }
-
 
     void PatrolBehaviour()
     {
+        print("patrol State");
+        if (fieldOFView.canSeePlayer)
+        {
+
+            curState = EnemyState.Detect;
+            return;
+        }
+        if (playerMovement.noiseTrigger && !fieldOFView.canSeePlayer)
+        {
+            noiseDist = (playerMovement.noisePosition - transform.position).sqrMagnitude;
+            if (noiseDist > hearingDis * hearingDis)
+            {
+                print("out of Range");
+                detecting = 0;
+                curState = EnemyState.Patrol;
+                return;
+            }
+            lastSeenPosition = playerMovement.noisePosition;
+            HasStartMoving = false;
+            playerLastSeenTime = 0;
+            curState = EnemyState.Investigate;
+            return;
+    
+        }
+        bodyMaterial.color = origColor;
         navMeshAgent.updateRotation = true;
         Vector3 nextPosition = guardPosition;
 
@@ -181,7 +132,125 @@ public class EnemyMovement : MonoBehaviour
 
         Move(nextPosition);
     }
+
+    void DetectBehvaiour()
+    {
+        print("Detect State");
+        navMeshAgent.ResetPath();
+        if (!fieldOFView.canSeePlayer)
+        {
+            detecting = 0;
+            curState = EnemyState.Search;
+        }
+        detecting += playerMovement.isCrouch ? Time.deltaTime * slowRate : Time.deltaTime * fastRate;
+        navMeshAgent.updateRotation = false;
+        Vector3 dir = fieldOFView.playerRef.transform.position - transform.position;
+        dir.y = 0;
+
+        if (dir.sqrMagnitude > 0.01f)
+        {
+            Quaternion targetRot = Quaternion.LookRotation(dir);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
+        }
+
+        if (detecting > detectionTimer)
+        {
+            curState = EnemyState.Chase;
+        }
+        float t = detecting / detectionTimer;
+        bodyMaterial.color = Color.Lerp(origColor, detectingColor, t);
+    }
     
+    void ChaseBehaviour()
+    {
+        print("chase State");
+        bodyMaterial.color = searchColor;
+        navMeshAgent.updateRotation = false;
+        navMeshAgent.stoppingDistance = playerStopDis;
+        Vector3 playerPos = fieldOFView.playerRef.transform.position;
+        Move(playerPos);
+        if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+        {
+            seenTimer += Time.deltaTime;
+            if (seenTimer > maxSeenTime && playerMovement.enabled)
+            {
+                print("Gameover");
+                gameOver = true;
+            }
+        }
+        else
+        {
+            seenTimer = 0;
+        }
+        if (!fieldOFView.canSeePlayer)
+        {
+            lastSeenPosition = fieldOFView.playerRef.transform.position; 
+            HasStartMoving = false;
+            playerLastSeenTime = 0;
+            detecting = 0;
+            curState = EnemyState.Investigate;
+            return;
+        }
+    }
+
+    void SearchBehaviour()
+    {
+        if (fieldOFView.canSeePlayer)
+        {
+            curState = EnemyState.Detect;
+            return;
+        }
+        print("search State");
+        navMeshAgent.updateRotation = true;
+        navMeshAgent.stoppingDistance = genStopDis;
+        playerLastSeenTime += Time.deltaTime;
+        float t = playerLastSeenTime / dwellTime;
+        bodyMaterial.color = Color.Lerp(detectingColor, origColor, t);
+        // transform.Rotate(0, searchRotateSpeed * Time.deltaTime, 0);
+        if (playerLastSeenTime >= dwellTime)
+        {
+            detecting = 0;
+            curState = EnemyState.Patrol;
+        }
+        if (playerMovement.noiseTrigger&&!fieldOFView.canSeePlayer)
+        {
+            noiseDist = (playerMovement.noisePosition - transform.position).sqrMagnitude;
+            if (noiseDist > hearingDis * hearingDis)
+            {
+                print("out of Range");
+                detecting = 0;
+                curState = EnemyState.Patrol;
+                return;
+            }
+            lastSeenPosition = playerMovement.noisePosition;
+            HasStartMoving = false;          
+            playerLastSeenTime = 0;
+            curState = EnemyState.Investigate;
+            return;
+        }
+    }
+    
+    void InvestigationBehaviour()
+    {
+        print("investigation state");
+        if(navMeshAgent.velocity.sqrMagnitude > 0.1f){
+            HasStartMoving = true;
+        }
+        if (HasStartMoving&&navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+        {
+            playerLastSeenTime = 0;
+            curState = EnemyState.Search;
+            return;
+        }
+        navMeshAgent.stoppingDistance = genStopDis;
+        bodyMaterial.color = detectingColor;
+        Move(lastSeenPosition);
+        if (fieldOFView.canSeePlayer)
+        {
+            curState = EnemyState.Chase;
+        }
+    }
+
     void Move(Vector3 targetPosition)
     {
         
@@ -210,27 +279,5 @@ public class EnemyMovement : MonoBehaviour
     {
         return Vector3.Distance(transform.position, GetCurrentWaypoint()) < wayPointTolerance;
     }
-    void HandleChase()
-    {
-        navMeshAgent.updateRotation = false;
-        navMeshAgent.stoppingDistance = playerStopDis;
-        Vector3 playerPos = fieldOFView.playerRef.transform.position;
-        lastSeenPosition = playerPos;
-        reachedLastSeen = false;
-        playerLastSeenTime = 0;
-        Move(playerPos);
-        if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
-        {
-            seenTimer += Time.deltaTime;
-            if (seenTimer > maxSeenTime&&playerMovement.enabled)
-            {
-                print("Gameover");
-                gameOver = true;
-            }
-        }
-        else
-        {
-            seenTimer = 0;
-        }
-    }
+    
 }
