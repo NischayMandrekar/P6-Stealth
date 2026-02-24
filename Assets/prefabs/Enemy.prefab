@@ -81,21 +81,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
   pPath: {fileID: 0}
   wayPointTolerance: 1
-  moveSpeed: 2
-  playerStopDis: 2
+  moveSpeed: 1.7
+  ChaseSpeed: 2.5
+  playerStopDis: 1.8
   genStopDis: 0
-  rotationSpeed: 6
-  dwellTime: 4
-  detectionTimer: 2
-  slowRate: 1
-  fastRate: 1.5
-  hearingDis: 8
-  maxSeenTime: 4
-  searchRotateSpeed: 80
+  rotationSpeed: 8
+  dwellTime: 2
+  detectionTimer: 4
+  slowRate: 2
+  fastRate: 6
+  hearingDis: 6
+  maxSeenTime: 1
   gameOver: 0
   bodyMesh: {fileID: 2463558830205114645}
-  searchColor: {r: 0, g: 0, b: 0, a: 0}
-  detectingColor: {r: 0.2528302, g: 0.0071555288, b: 0.0071555288, a: 0}
+  searchColor: {r: 0.24528301, g: 0.07728728, b: 0.07728728, a: 0}
+  detectingColor: {r: 0.5245282, g: 0.1058953, b: 0.1058953, a: 0}
 --- !u!114 &-2882363086793222293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109,7 +109,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FieldOFView
   radius: 4
-  angle: 90
+  angle: 120
   playerRef: {fileID: 0}
   targetMask:
     serializedVersion: 2
@@ -131,7 +131,7 @@ NavMeshAgent:
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
-  m_AngularSpeed: 200
+  m_AngularSpeed: 250
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1

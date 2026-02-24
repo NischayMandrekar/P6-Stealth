@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -9,6 +11,9 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] winTrigger winGate;
     [SerializeField] PlayerMovement playerMovement;
+    [SerializeField] TMP_Text GameOverText;
+    [SerializeField] TMP_Text YouWinText;
+    [SerializeField] TMP_Text GoalText;
     bool GameOver;
     bool restart;
     GameObject[] enemies;
@@ -28,8 +33,17 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+      StartCoroutine(ShowGoalText());
       enemies = GameObject.FindGameObjectsWithTag("Enemy");
     }
+
+    IEnumerator ShowGoalText()
+    {
+        GoalText.gameObject.SetActive(true);
+        yield return new WaitForSeconds(2);
+        GoalText.gameObject.SetActive(false);
+    }
+
     void Update()
     {
         foreach (GameObject enemy in enemies)
@@ -37,13 +51,30 @@ public class GameManager : MonoBehaviour
             EnemyMovement enemyMovement = enemy.GetComponent<EnemyMovement>();
             if (enemyMovement.gameOver&&!GameOver)
             {
+                Destroy(playerMovement.gameObject);
+                GameOverText.gameObject.SetActive(true);
                 GameOver = true;
                 playerMovement.enabled = false;
+                foreach (GameObject en in enemies)
+            {
+                if (en.GetComponent<EnemyMovement>() != null)
+                {
+                    en.GetComponent<EnemyMovement>().enabled = false;
+                }
+                NavMeshAgent agent = en.GetComponent<NavMeshAgent>();
+                if (agent != null)
+                {
+                    agent.enabled = false;
+                }
+            }
+
             }
         }
         if (winGate.GameWon && !GameOver)
         {
+            YouWinText.gameObject.SetActive(true);
             playerMovement.enabled = false;
+            Destroy(playerMovement.gameObject);
             GameOver = true;
             print("won");
             foreach (GameObject enemy in enemies)

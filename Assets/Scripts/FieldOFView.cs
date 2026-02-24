@@ -48,7 +48,7 @@ public class FieldOFView : MonoBehaviour
 
                 if (!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstructionMask))
                 {
-                        canSeePlayer = true;
+                    canSeePlayer = true;
                     print("Enemy Spotted");
                 }
                 else
@@ -60,9 +60,8 @@ public class FieldOFView : MonoBehaviour
         else if (canSeePlayer)
             canSeePlayer = false;
     }
-
-    private void OnDrawGizmos()
-    {
+    
+    private void OnDrawGizmosSelected() {
         Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(transform.position, radius);
         Vector3 angle1 = DirectionFromAngle(transform.eulerAngles.y, -angle / 2);

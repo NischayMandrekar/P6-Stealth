@@ -11,6 +11,7 @@ public class EnemyMovement : MonoBehaviour
 
     [Header("Movement")]
     [SerializeField] float moveSpeed = 2f;
+    [SerializeField] float ChaseSpeed = 3f;
     [SerializeField] float playerStopDis = 2f;
     [SerializeField] float genStopDis = .5f;
     [SerializeField] float rotationSpeed=10f;
@@ -23,7 +24,6 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] float hearingDis=4;
     float detecting;
     [SerializeField] float maxSeenTime = 4;
-    [SerializeField] float searchRotateSpeed = 120f;
 
     public bool gameOver;
 
@@ -66,6 +66,7 @@ public class EnemyMovement : MonoBehaviour
         origColor = bodyMaterial.color;
         guardPosition = transform.position;
         navMeshAgent.speed = moveSpeed;
+        curState = EnemyState.Patrol;
     }
 
     void Update()
@@ -92,6 +93,7 @@ public class EnemyMovement : MonoBehaviour
 
     void PatrolBehaviour()
     {
+        navMeshAgent.speed = moveSpeed;
         print("patrol State");
         if (fieldOFView.canSeePlayer)
         {
@@ -163,13 +165,14 @@ public class EnemyMovement : MonoBehaviour
     
     void ChaseBehaviour()
     {
+        navMeshAgent.speed = ChaseSpeed;
         print("chase State");
         bodyMaterial.color = searchColor;
         navMeshAgent.updateRotation = false;
         navMeshAgent.stoppingDistance = playerStopDis;
         Vector3 playerPos = fieldOFView.playerRef.transform.position;
         Move(playerPos);
-        if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+        if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance+.3f)
         {
             seenTimer += Time.deltaTime;
             if (seenTimer > maxSeenTime && playerMovement.enabled)
@@ -195,6 +198,7 @@ public class EnemyMovement : MonoBehaviour
 
     void SearchBehaviour()
     {
+        navMeshAgent.speed = moveSpeed;
         if (fieldOFView.canSeePlayer)
         {
             curState = EnemyState.Detect;
@@ -232,7 +236,9 @@ public class EnemyMovement : MonoBehaviour
     
     void InvestigationBehaviour()
     {
+        navMeshAgent.speed = ChaseSpeed;
         print("investigation state");
+        navMeshAgent.updateRotation = true;
         if(navMeshAgent.velocity.sqrMagnitude > 0.1f){
             HasStartMoving = true;
         }
@@ -278,6 +284,11 @@ public class EnemyMovement : MonoBehaviour
     bool AtWaypoint()
     {
         return Vector3.Distance(transform.position, GetCurrentWaypoint()) < wayPointTolerance;
+    }
+    private void OnDrawGizmosSelected()
+    {
+       Gizmos.color = Color.green;
+       Gizmos.DrawWireSphere(transform.position, hearingDis);
     }
     
 }
